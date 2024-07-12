@@ -1,61 +1,79 @@
-<!doctype html>
-<html lang="en">
+<!-- invoice_form.html -->
+
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Invoice</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Invoice Form - Aenzbi</title>
 </head>
 <body>
-    <h1>Invoice</h1>
-    <div>
-        <h2>Company Information</h2>
-        <p><strong>Name:</strong> {{ company.name }}</p>
-        <p><strong>NIF:</strong> {{ company.nif }}</p>
-        <p><strong>VAT Subject:</strong> {{ 'Yes' if company.vat_subject else 'No' }}</p>
-    </div>
-    <div>
-        <h2>Customer Information</h2>
-        <p><strong>Name:</strong> {{ facture.customer_name }}</p>
-        <p><strong>Address:</strong> {{ facture.customer_address }}</p>
-        <p><strong>NIF:</strong> {{ facture.customer_nif }}</p>
-    </div>
-    <div>
-        <h2>Invoice Details</h2>
-        <p><strong>Invoice Number:</strong> {{ facture.invoice_number }}</p>
-        <p><strong>Date:</strong> {{ facture.date.strftime('%Y-%m-%d') }}</p>
-        <p><strong>Payment Method:</strong> {{ facture.payment_method }}</p>
-    </div>
-    <div>
-        <h2>Items</h2>
-        <table>
-            <thead>
+    <h1>Invoice Form - Aenzbi</h1>
+    <form id="invoiceForm">
+        <fieldset>
+            <legend>A. Identification du vendeur</legend>
+            Nom et prénom ou Raison sociale: <input type="text" id="sellerName" required><br>
+            NIF: <input type="text" id="sellerNIF" required><br>
+            Registre de Commerce N°: <input type="text" id="sellerRegistre" required><br>
+            B.P: <input type="text" id="sellerBP"><br>
+            Téléphone: <input type="text" id="sellerPhone"><br>
+            Commune: <input type="text" id="sellerCommune"><br>
+            Quartier: <input type="text" id="sellerQuartier"><br>
+            Av.: <input type="text" id="sellerAvenue"><br>
+            Rue: <input type="text" id="sellerRue"><br>
+            N°: <input type="text" id="sellerNumber"><br>
+            Assujetti à la TVA: <input type="checkbox" id="sellerTVA"><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>B. Le client</legend>
+            Nom et prénom ou Raison sociale: <input type="text" id="clientName" required><br>
+            NIF: <input type="text" id="clientNIF" required><br>
+            Résident à: <input type="text" id="clientResident"><br>
+            Assujetti à la TVA: <input type="checkbox" id="clientTVA"><br>
+        </fieldset>
+
+        <fieldset>
+            <legend>Invoice Details</legend>
+            <table id="invoiceTable">
                 <tr>
-                    <th>Product Code</th>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
+                    <th>Nature de l’article ou service</th>
+                    <th>Qté</th>
+                    <th>PU</th>
+                    <th>PVHTVA</th>
                 </tr>
-            </thead>
-            <tbody>
-                {% for item in facture.items %}
                 <tr>
-                    <td>{{ item.product_code }}</td>
-                    <td>{{ item.description }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.unit_price }}</td>
-                    <td>{{ item.total_price }}</td>
+                    <td><input type="text" name="article" required></td>
+                    <td><input type="number" name="quantity" required></td>
+                    <td><input type="number" name="price" required></td>
+                    <td><input type="number" name="total" required></td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div>
-        <h2>Total</h2>
-        <p><strong>Total HT:</strong> {{ facture.total_ht }}</p>
-        <p><strong>Tax Rate:</strong> {{ facture.tax_rate }}</p>
-        <p><strong>Total TTC:</strong> {{ facture.total_ttc }}</p>
-    </div>
-    <button onclick="window.print()">Print Invoice</button>
+            </table>
+        </fieldset>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <script>
+        function submitForm() {
+            const form = document.getElementById('invoiceForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('https://ebms.obr.gov.bi:9443/ebms_api/addInvoice', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer YOUR_TOKEN_HERE',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (response.ok) {
+                    alert('Invoice posted successfully!');
+                } else {
+                    alert('Failed to post invoice.');
+                }
+            });
+        }
+    </script>
+    <footer>&copy; Aenzbi</footer>
 </body>
 </html>
