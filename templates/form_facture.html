@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Facture</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Create Facture</h1>
+    <form method="POST" action="/">
+        {{ csrf_token() }}
+        <label for="invoice_number">Invoice Number:</label>
+        <input type="text" id="invoice_number" name="invoice_number" required><br>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="customer_name">Customer Name:</label>
+        <input type="text" id="customer_name" name="customer_name" required><br>
+
+        <label for="customer_address">Customer Address:</label>
+        <input type="text" id="customer_address" name="customer_address" required><br>
+
+        <label for="customer_nif">Customer NIF:</label>
+        <input type="text" id="customer_nif" name="customer_nif" required><br>
+
+        <label for="company_name">Company Name:</label>
+        <select id="company_name" name="company_name" required>
+            {% for company in companies %}
+                <option value="{{ company.name }}">{{ company.name }}</option>
+            {% endfor %}
+            <option value="new_company">New Company</option>
+        </select><br>
+
+        <div id="new_company_details" style="display: none;">
+            <label for="company_address">Company Address:</label>
+            <input type="text" id="company_address" name="company_address"><br>
+
+            <label for="company_nif">Company NIF:</label>
+            <input type="text" id="company_nif" name="company_nif"><br>
+
+            <label for="company_vat_subject">VAT Subject:</label>
+            <input type="checkbox" id="company_vat_subject" name="company_vat_subject"><br>
+        </div>
+
+        <label for="num_items">Number of Items:</label>
+        <input type="number" id="num_items" name="num_items" min="1" value="1" required><br>
+
+        <div id="items_container">
+            <div class="item">
+                <label for="product_code_1">Product Code:</label>
+                <input type="text" id="product_code_1" name="product_code_1" required><br>
+
+                <label for="description_1">Description:</label>
+                <input type="text" id="description_1" name="description_1" required><br>
+
+                <label for="quantity_1">Quantity:</label>
+                <input type="number" id="quantity_1" name="quantity_1" min="1" required><br>
+
+                <label for="unit_price_1">Unit Price:</label>
+                <input type="number" id="unit_price_1" name="unit_price_1" step="0.01" required><br>
+
+                <label for="total_price_1">Total Price:</label>
+                <input type="number" id="total_price_1" name="total_price_1" step="0.01" required readonly><br>
+            </div>
+        </div>
+
+        <label for="total_ht">Total HT:</label>
+        <input type="number" id="total_ht" name="total_ht" step="0.01" required><br>
+
+        <label for="tax_rate">Tax Rate:</label>
+        <input type="number" id="tax_rate" name="tax_rate" step="0.01" required><br>
+
+        <label for="payment_method">Payment Method:</label>
+        <input type="text" id="payment_method" name="payment_method" required><br>
+
+        <button type="submit">Create Facture</button>
+    </form>
+
+    <script>
+        document.getElementById('company_name').addEventListener('change', function() {
+            var newCompanyDetails = document.getElementById('new_company_details');
+            if (this.value === 'new_company') {
+                newCompanyDetails.style.display = 'block';
+            } else {
+                newCompanyDetails.style.display = 'none';
+            }
+        });
+
+        document.getElementById('num_items').addEventListener('input', function() {
+            var numItems = parseInt(this.value);
+            var itemsContainer = document.getElementById('items_container');
+            itemsContainer.innerHTML = '';
+            for (var i = 1; i <= numItems; i++) {
+                itemsContainer.innerHTML += `
+                    <div class="item">
+                        <label for="product_code_${i}">Product Code:</label>
+                        <input type="text" id="product_code_${i}" name="product_code_${i}" required><br>
+
+                        <label for="description_${i}">Description:</label>
+                        <input type="text" id="description_${i}" name="description_${i}" required><br>
+
+                        <label for="quantity_${i}">Quantity:</label>
+                        <input type="number" id="quantity_${i}" name="quantity_${i}" min="1" required><br>
+
+                        <label for="unit_price_${i}">Unit Price:</label>
+                        <input type="number" id="unit_price_${i}" name="unit_price_${i}" step="0.01" required><br>
+
+                        <label for="total_price_${i}">Total Price:</label>
+                        <input type="number" id="total_price_${i}" name="total_price_${i}" step="0.01" required readonly><br>
+                    </div>
+                `;
+            }
+        });
+
+        document.getElementById('items_container').addEventListener('input', function(e) {
+            if (e.target && e.target.matches('input[id^="quantity_"], input[id^="unit_price_"]')) {
+                var id = e.target.id.match(/\d+/)[0];
+                var quantity = parseFloat(document.getElementById('quantity_' + id).value) || 0;
+                var unitPrice = parseFloat(document.getElementById('unit_price_' + id).value) || 0;
+                document.getElementById('total_price_' + id).value = (quantity * unitPrice).toFixed(2);
+            }
+        });
+    </script>
+</body>
+</html>
