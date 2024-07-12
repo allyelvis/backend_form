@@ -1,0 +1,17 @@
+your_project/
+│
+├── app/
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── templates/
+│   │   ├── facture_form.html
+│   │   ├── add_product.html
+│   │   ├── update_stock.html
+│   │   ├── configure_ebms.html
+│   │   └── invoice_template.html
+│   └── static/
+│       └── styles.css
+├── config.py
+└── run.py
