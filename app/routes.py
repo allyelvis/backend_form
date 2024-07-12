@@ -205,3 +205,19 @@ def update_stock():
         stock_entry = next((s for s in stock_database if s['company_name'] == company_name and s['product_code'] == product_code), None)
         if stock_entry:
             stock_entry['quantity'] += quantity
+        else:
+            stock_database.append({"company_name": company_name, "product_code": product_code, "quantity": quantity})
+
+        return redirect(url_for('main.update_stock'))
+
+    return render_template('update_stock.html')
+
+# Route for configuring EBMS
+@main.route('/configure_ebms', methods=['GET', 'POST'])
+def configure_ebms():
+    if request.method == 'POST':
+        global EBMS_BEARER_TOKEN
+        EBMS_BEARER_TOKEN = request.form['ebms_bearer_token']
+        return redirect(url_for('main.facture_form'))
+
+    return render_template('configure_ebms.html')
